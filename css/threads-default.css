@@ -1,0 +1,211 @@
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: #ffffff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    margin: auto;
+    max-width: 800px;
+    padding: 40px;
+}
+
+.icon-img {
+    width: 100px;
+    height: auto;
+    vertical-align: middle;
+}
+
+.title-bar {
+    background-color: #595959;
+    display: flex;
+    flex-direction: column; /* Stack children vertically */
+}
+
+.app-bar {
+    align-items: center;
+    background-color: #333;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0px;
+    width: 100%; /* Sets the width of the appbar to full width of its container */
+}
+
+.nav-left {
+    color: inherit;
+    margin: 0 5px;
+    padding: 8px;
+    text-align: left;
+    text-decoration: none;
+    width: 40%; /* Sets the width of the left nav element to 40% */
+}
+
+.nav-middle {
+    color: inherit;
+    margin: 0 5px;
+    padding: 8px;
+    text-align: center;
+    text-decoration: none;
+    width: 20%; /* Sets the width of the middle nav element to 20% */
+}
+
+.nav-right {
+    color: inherit;
+    margin: 0 5px;
+    padding: 8px;
+    text-align: right;
+    text-decoration: none;
+    width: 40%; /* Sets the width of the right nav element to 40% */
+}
+
+nav a {
+    background-color: rgb(69, 69, 69);
+    color: rgb(255, 255, 255);
+    /* display: block; /* Makes the anchor tags block level for easier styling */
+    padding: 10px;
+    text-decoration: none;
+}
+
+.nav-left a:hover, .nav-middle a:hover, .nav-right a:hover {
+    background-color: transparent;
+}
+
+u {
+    text-underline-offset: 4px;
+}
+
+h1 {
+    color: #333;
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    margin-top: 20px;
+    text-align: center;
+}
+
+h1.title-bar {
+    color: #b4adad;
+}
+
+h2 {
+    color: #333;
+    font-size: 1.2em;
+    font-weight: normal; /* Equivalent to 400 */
+    margin-bottom: 5px;
+    padding-bottom: 6px;
+    padding-top: 0px;
+}
+
+h3 {
+    color: #333;
+    font-size: 1.1em;
+    font-weight: normal;
+    margin-bottom: 4px;
+    padding-bottom: 5px;
+    padding-top: 0px;
+}
+
+.divider {
+    border-top: 2px solid #eee;
+    display: block;
+    margin-bottom: 0px;
+    margin-top: 0px;
+}
+
+.start-divider {
+    border-top: 2px solid #eee;
+    display: block;
+    margin-bottom: 0px;
+    margin-top: 10px;
+}
+
+p {
+    margin: 10px 0px;
+}
+
+ul {
+    margin-block-start: 10px;
+    margin-block-end: 10px;
+    padding-inline-start: 25px;
+}
+
+ul.bullet { /* Default */
+    list-style-type: disc; /* This is the default style */
+    margin-block-start: 10px;
+    margin-block-end: 10px;
+    padding-inline-start: 25px;
+}
+
+ul.arrow-list {
+    list-style-type: none; /* Removes default bullets */
+    padding-left: 10px;
+    margin-left: 0px;
+}
+
+ul.arrow-list li {
+    padding-left: 1em;
+    text-indent: -1em;
+}
+
+ul.arrow-list li::before {
+    content: "→ ";
+    padding-right: 2px;
+}
+
+ul:not(.arrow-list) li::before {
+    content: ""; /* Ensures no content is added before other list items */
+}
+
+code {
+    background-color: #eef1f5;
+    border-radius: 8px;
+    display: block;
+    font-size: 1.2em;
+    overflow-x: auto;
+    padding: 16px;
+    white-space: pre;
+}
+
+aside {
+    align-items: center; /* Vertically centers the icon and text */
+    border-left-style: solid;
+    border-left-width: 6px;
+    display: flex; /* Makes the aside element a flex container */
+    font-size: 1.0em;
+    margin: 10px 0;
+    padding: 5px;
+}
+
+.warning {
+    background-color: #fff3cd;
+    border-left-color: #fce7aa;
+}
+
+.question {
+    background-color: #fdb9b9;
+    border-left-color: #ff9d9d;
+}
+
+.question-line {
+    color: #000000bc;
+    display: inline-block;
+    font-size: 1.1em;
+    font-weight: bold;
+    margin-bottom: 12px;
+}
+
+.aside-icon {
+    font-size: 1.8em;
+    margin-right: 10px;
+}
+
+.caption {
+    color: #666;
+    font-size: 0.95em;
+    margin-bottom: 40px;
+}
+
+.link {
+    color: #4e5dcd;
+}
