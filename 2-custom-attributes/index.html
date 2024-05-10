@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Thread attributes</title>
+        <link rel="icon" type="image/png" href="../../../assets/img/logo.png">
+        <meta name="author" content="Costas">
+        <meta name="publisher" content="PiTM">
+        <meta name="description" content="Step-by-step guide to adding custom attributes to a thread in C using pthreads.">
+        <meta name="keywords" content="C programming, pthreads, threading, attributes, beginner guide">
+        <link rel="stylesheet" href="../../../css/threads-default.css">
+    </head>
+
+    <body>
+
+    <!------------------------------------------Title Bar----------------------------------------->
+        <div class="title-bar">
+
+        <!--------------------------------------App Bar--------------------------------------->
+            <header class="app-bar" id="home">
+                <nav class="nav-left">
+                    <a href="../1-getting-started/index.html">Previous Page</a>
+                </nav>
+                <nav class="nav-middle">
+                    <a href="https://www.pitmtech.com/">Homepage</a>
+                </nav>
+                <nav class="nav-right">
+                    <a href="../3-threads-list/index.html">Next Page</a>
+                </nav>
+            </header>
+
+        <!--------------------------------------Title----------------------------------------->
+            <h1 class="title-bar">Adding custom attributes to a thread</h1>
+        </div> <!-- Title Bar -->
+
+        <!------------------------------------------Step One------------------------------------------>
+        <div class="divider"></div>
+        <div class="step" id="step-1">
+            <h2>1. Declare a <u>variable for the thread's attributes</u> of type '<i>pthread_attr_t</i>':</h2>
+            <code>pthread_attr_t attr;</code>
+            <span class="caption">
+                <ul class="bullet">
+                    <li>This instance is initialized using the function '<i>pthread_attr_init</i>'.</li>
+                </ul>
+            </span>
+        </div> <!-- Step 1 -->
+
+        <!------------------------------------------Step Two------------------------------------------>
+        <div class="divider"></div>
+        <div class="step" id="step-2">
+            <h2>2. <u>Initialize</u> the thread's attributes object:</h2>
+            <code>pthread_attr_init(&attr);</code>
+            <span class="caption">
+                <ul class="bullet">
+                    <li>The attributes can be further modified as shown below.</li>
+                </ul>
+            </span>
+
+            <div class="step" id="step-2-addition-1">
+                <h2><b>(+)</b> Add <u>error handling</u>:</h2>
+                <code>thread_attr_init_status = pthread_attr_init(&attr);
+if (thread_attr_init_status != 0) {
+    fprintf(stderr, "Failed to initialize thread attributes object 'attr'.\n");
+    return EXIT_FAILURE;
+}</code>
+            </div> <!-- Additional Step 1 -->
+
+            <div class="step" id="step-2-addition-2">
+                <h2><b>(+ Attribute 1)</b> Set desired stack size:</h2>
+                <code>size_t stack_size = 1024 * 1024; // 1 MB
+pthread_attr_setstacksize(&attr, stack_size);</code>
+            </div> <!-- Additional Step 2 -->
+
+            <!-- Add more here -->
+
+        </div> <!-- Step 2 -->
+
+        <!------------------------------------------Step Three---------------------------------------->
+        <div class="divider"></div>
+        <div class="step" id="step-3">
+            <h2>3. <u>Create</u> the thread with custom attributes:</h2>
+            <code>pthread_create(&tid, &attr, thread_function, &thread_id);</code>
+            <span class="caption">
+                <ul class="bullet">
+                    <li>Second parameter (thread's attributes): <i>NULL</i> for default, &&lt;<i>attributes_object_name</i>&gt; for custom.</li>
+                </ul>
+            </span>
+
+            <div class="step" id="step-3-addition-1">
+                <h2><b>(+)</b> Add <u>error handling</u> (just like we did in <a href="../1-getting-started/index.html" target="_blank"><span class="link">Lecture 1 - Point 4</span></a>):</h2>
+                <code>int thread_create_status = pthread_create(&tid, &attr, thread_function, &thread_id);
+if (thread_create_status != 0) {
+    fprintf(stderr, "Failed to create thread.\n");
+    return EXIT_FAILURE;
+}</code>
+                <span class="caption">
+                    <ul class="bullet">
+                        <li>Don't forget to include the library &lt;<i>stdlib.h</i>&gt; (for the exit code: <i>EXIT_FAILURE</i> and more).</li>
+                    </ul>
+                </span>
+            </div> <!-- Additional Step 1 -->
+
+        </div> <!-- Step 3 -->
+
+        <!-- Step 4 -->
+        <div class="divider"></div>
+        <div class="step" id="step-4">
+            <h2>4. <u>Clean up</u> the thread attributes object:</h2>
+            <code>pthread_attr_destroy(&attr);</code>
+            <span class="caption">
+                <ul class="bullet">
+                    <li>No further clean-up should be done, unless the '<i>attr</i>' variable has been dynamically allocated.</li>
+                </ul>
+            </span>
+        </div> <!-- Step 4 -->
+
+    <!------------------------------------------Final Part---------------------------------------->
+        <div class="divider"></div>
+        <div class="step" id="final-step">
+            <h2>The final code of a program for adding custom attributes to a basic thread may look like that:</h2>
+            <code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;pthread.h&gt;
+
+void* threadFunction(void *threadId) {
+    int tid = *((int*)threadId);
+    fprintf(stdout, "Hello from Thread %d!\n", tid);
+    return NULL;
+}
+
+int main() {
+    pthread_t tid;
+    pthread_attr_t attr;
+    size_t stackSize;
+    int ret_tcreate;
+    void *ret_tjoin;
+    
+    // Define an integer to represent the thread ID
+    int threadID = 1;
+    
+    // Initialize thread attributes object
+    pthread_attr_init(&attr);
+    
+    // Set desired stack size
+    stackSize = 1024 * 1024; // 1 MB
+    pthread_attr_setstacksize(&attr, stackSize);
+    
+    // Create the thread with attributes
+    ret_tcreate = pthread_create(&tid, &attr, threadFunction, &threadID);
+    if (returnValue != 0) {
+        perror("pthread_create");
+        exit(EXIT_FAILURE);
+    }
+    
+    // Wait for the thread to finish
+    pthread_join(tid, ret_tjoin);
+    
+    // Clean up the thread attributes object
+    pthread_attr_destroy(&attr);
+    
+    return 0;
+}
+    </code>
+        </div> <!--Final Step -->
+
+        <!------------------------------------------Title Bar----------------------------------------->
+        <header class="app-bar" id="bottom">
+            <nav class="nav-left">
+                <a href="#top">Go to top</a>
+            </nav>
+            <nav class="nav-right">
+                <a href="../3-threads-list/index.html">Next Page</a>
+            </nav>
+        </header>
+
+    </body>
+</html>
