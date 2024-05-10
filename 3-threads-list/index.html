@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Threads List</title>
+        <link rel="icon" type="image/png" href="../../../assets/img/logo.png">
+        <meta name="author" content="Costas">
+        <meta name="publisher" content="PiTM">
+        <meta name="description" content="Step-by-step guide to creating a list of threads in C using pthreads.">
+        <meta name="keywords" content="C programming, pthreads, threading, threads list, beginner guide">
+        <link rel="stylesheet" href="../../../css/threads-default.css">
+    </head>
+
+    <body>
+
+        <!------------------------------------------Title Bar----------------------------------------->
+        <div class="title-bar">
+
+            <!--------------------------------------App Bar--------------------------------------->
+                <header class="app-bar" id="home">
+                    <nav class="nav-left">
+                        <a href="../2-custom-attributes/index.html">Previous Page</a>
+                    </nav>
+                    <nav class="nav-middle">
+                        <a href="https://www.pitmtech.com/">Homepage</a>
+                    </nav>
+                    <nav class="nav-right">
+                        <a href="">Next Page</a>
+                    </nav>
+                </header>
+        
+            <!--------------------------------------Title----------------------------------------->
+                <h1 class="title-bar">Working with a list of threads</h1>
+            </div>
+
+        <!------------------------------------------Step One------------------------------------------>
+        <div class="divider"></div>
+        <div class="step" id="step-1">
+            <h2>1. Include the <u>library</u> for <b>dynamic allocation</b>:</h2>
+            <code>#include &lt;stdlib.h&gt;</code>
+            <span class="caption">
+                <ul class="bullet">
+                    <li>See more: <a href="https://en.wikibooks.org/wiki/C_Programming/stdlib.h" target="_blank"><span class="link">link</span></a></li>
+                </ul>
+            </div>
+        </div> <!-- Step 1 -->
+
+        <!------------------------------------------Step Two------------------------------------------>
+        <div class="divider"></div>
+        <div class="step" id="step-2">
+            <h2>2. Ask for the <b>number of threads</b>:</h2>
+            <code>int number_of_threads;
+fprintf(stdout, "Give me the number of threads: ");
+scanf("%d", &number_of_threads);</code>
+            <span class="caption">
+                <ul class="bullet">
+                    <li>Later on, we'll use a more <i>elegant</i> way of getting the threads.</li>
+                </ul>
+            </span>
+
+            <div class="step" id="step-3-addition-1">
+                <h2><b>(+)</b> Add <u>error handling</u>:</h2>
+                <code>#include &lt;stdbool.h&gt;
+// (...)
+int number_of_threads;
+bool ret_scanf_isValid;
+do {
+    fprintf(stdout, "Give me the number of threads: ");
+
+    
+} while (number_of_threads <= 0);</code>
+                <span class="caption">
+                    <ul class="arrow-list">
+                        <li>Don't forget to include the library &lt;<i>stdbool.h</i>&gt;.</li>
+                        <li>The condition of the do-while loop is redundant in this case, <b>BUT</b> adding it keeps the code <u>safe</u> for future changes.</li>
+                    </ul>
+                </span>
+            </div>
+        </div> <!-- Step 2 -->
+
+        <!------------------------------------------Step Three---------------------------------------->
+        <div class="divider"></div>
+        <div class="step" id="step-3">
+            <h2>3. <b>Create</b> and <b>initialize</b> an <u>attributes object</u> for <u>all</u> the threads (as we already know):</h2>
+            <code>size_t stack_size = 1024 * 1024; // 1 MB
+pthread_attr_t attr;
+pthread_attr_init(&attr);
+pthread_attr_setstacksize(&attr, stack_size);</code>
+            <span class="caption">
+                <ul class="bullet">
+                    <li>This is of course optional, but I think it's better to have a view of the overall image.</li>
+                </ul>
+            </span>
+        </div>
+
+        <!------------------------------------------Step Four----------------------------------------->
+        <div class="divider"></div>
+        <div class="step" id="step-4">
+            <h2>4. <b>Dynamically allocate</b> a <u>list of thread IDs</u> (size given at runtime):</h2>
+            
+            <code>pthread_t *tids = malloc(number_of_threads * sizeof(*tids));</code>
+            <span class="caption">
+                <ul class="arrow-list">
+                    <li>'<i>malloc</i>' returns a <b>void pointer</b>, which can be implicitly <u>converted to any other pointer type</u> <b>without a cast</b>. This implicit conversion is a feature in C, designed with the intention of making the use of '<i>malloc</i>' <u>easy to use</u> directly with <b>any</b> pointer type.</li>
+                    <li>C++ <b>does</b> require the cast because it has stricter type checking. However, writing in a C context <b>does not</b> necessitate the cast, and removing it <u>makes the code more idiomatic to C</u>.</li>
+                </ul>
+            </span>
+            
+            <aside class="warning">
+                <span class="aside-icon">⚠️</span>
+                <p>
+                    The caption of the previous code implies that the code below should be avoided in C:
+                </p>
+            </aside>
+            
+            <code>pthread_t *tids = (pthread_t*)malloc(number_of_threads * sizeof(*tids));</code>
+            <span class="caption">
+                <ul class="bullet">
+                    <li>The type cast '<i>(pthread_t*)</i>' before the '<i>malloc</i>' is the "problem" here.</li>
+                </ul>
+            </span>
+
+            <h2><b>(+)</b> Add <u>error handling</u>:</h2>
+            <code>pthread_t *tids = malloc(number_of_threads * sizeof(*tids));
+if (tids == NULL) { // or: if (!tids)
+    fprintf(stderr, "Error in allocating memory for thread list.\n");
+    return EXIT_FAILURE;
+}</code>
+            <span class="caption">
+                <ul class="bullet">
+                    <li>Type casting when allocating memory (e.g.: here using '<i>malloc</i>'), is generally discouraged, as it can hide certain errors (like forgetting to include '<i>stdlib.h</i>', which declares '<i>malloc</i>').</li>
+                </ul>
+            </span>
+            
+        </div> <!-- Step 4 -->
+
+        <!------------------------------------------Step Five----------------------------------------->
+        <div class="divider"></div>
+        <div class="step" id="step-5">
+            <h2>5. Use a <b>loop</b> for all threads to be created.</h2>
+            <code>int thread_create_status;
+
+for (int i = 0; i < number_of_threads; ++i) {
+    int* indiv_thr = malloc(sizeof(*indiv_thr));
+    if (indiv_thr == NULL) {
+        fprintf(stderr, "Failed to allocate memory for individual thread %d.\n", i);
+        continue;
+    }
+    *indiv_thr = i;
+    thread_create_status = pthread_create(&tids[i], &attr, thread_function, indiv_thr);
+    if (thread_create_status != 0) {
+        fprintf(stderr, "Failed to create thread %d.\n", i);
+        // Make sure to free the successfully-allocated but failed-to-create thread
+        free(indiv_thr);
+        continue; // Not necessary, but enables scalability of code
+    }
+}</code>
+
+            <span class="caption">
+                <ul class="arrow-list">
+                    <li>Notice that we're using '<i>sizeof()</i>' by passing the <u>variable itself</u>, and <b>not</b> its type. It's a good practice passing the variable itself, which increases the <b>Maintainability</b>, <b>Readability</b>, and <b>Reduces Errors</b> in our code.</li>
+                    <li>At the <b>end</b> of the program, <u>do not</u> forget to <b>free the memory</b> allocated for the thread IDs.</li>
+                </ul>
+            </span>
+
+            <aside class="warning">
+                <span class="aside-icon">⚠️</span>
+                <p>
+                    Do <b>not</b> pass the variable's type in '<i>sizeof</i>', but instead pass the <u>variable itself</u>. The false code would look like this:
+                </p>
+            </aside>
+
+            <code>int *indiv_thr = malloc(sizeof(int));</code>
+            <span class="caption">
+                <ul class="bullet">
+                    <li>'<i>*indiv_thr</i>' should be passed, instead of '<i>int</i>'.</li>
+                </ul>
+            </span>
+
+            <aside class="warning">
+                <span class="aside-icon">⚠️</span>
+                <p>
+                    Notice that in the 'pthread_create' function, we're passing 'indiv_thr' as the last argument.
+                    If you go back to the first lecture, you'll see that it took the address thread ID. Now that
+                    we have dynamically allocated the thread ID, the pointer itself shows the memory address of
+                    the thread ID, and thus the memory address is passed directly.
+                </p>
+            </aside>
+
+            <aside class="warning">
+                <span class="aside-icon">⚠️</span>
+                <p>
+                    Always <u>remember to free</u> dynamically allocated memory. Since we allocate memory for each
+                    individual thread, we must <b>deallocate</b> it either right before the end of the for-loo, or
+                    at the end of the <u>thread's function</u>. I'll go with a second approach, as shown below:
+                </p>
+            </aside>
+            
+            <code>void *thread_function(void *thread_id){
+    int tid = *((int*)thread_id);
+    fprintf(stdout, "Hello from Thread %d!\n", tid);
+    free(thread_id);
+    return NULL;
+}</code>
+            <span class="caption">
+                <ul class="arrow-list">
+                    <li>Used the same thread's function, but just added the '<i>free(thread_id)</i>' part.</li>
+                    <li><b>Note</b> that we don't have to do this in the examples of the previous lectures, since we were not dealing with dynamically allocated thread IDs, but rather one (1) thread ID of type '<i>pthread_t</i>'.</li>
+                </ul>
+            </span>
+        </div> <!-- Step 5 -->
+
+        <!------------------------------------------Step Six------------------------------------------>
+        <div class="divider"></div>
+        <div class="step" id="step-6">
+
+        </div> <!-- Step 6 -->
+
+        <!------------------------------------------Title Bar----------------------------------------->
+        <header class="app-bar" id="bottom">
+            <nav class="nav-left">
+                <a href="#top">Go to top</a>
+            </nav>
+            <nav class="nav-right">
+                <a href="">Next Page</a>
+            </nav>
+        </header>
+    </body>
+</html>
