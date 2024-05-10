@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Getting Started</title>
+        <link rel="icon" type="image/png" href="../../../assets/img/logo.png">
+        <meta name="author" content="Costas">
+        <meta name="publisher" content="PiTM">
+        <meta name="description" content="Step-by-step guide to creating a basic thread in C using pthreads.">
+        <meta name="keywords" content="C programming, pthreads, threading, beginner guide">
+        <link rel="stylesheet" href="../../../css/threads-default.css">
+    </head>
+
+    <body>
+
+    <!------------------------------------------Title Bar----------------------------------------->
+        <div class="title-bar">
+
+        <!--------------------------------------App Bar--------------------------------------->
+            <header class="app-bar" id="home">
+                <nav class="nav-left"></nav>
+                <nav class="nav-middle">
+                    <a href="https://www.pitmtech.com/">Homepage</a>
+                </nav>
+                <nav class="nav-r ight">
+                    <a href="../2-custom-attributes/index.html">Next Page</a>
+                </nav>
+            </header>
+
+        <!--------------------------------------Title----------------------------------------->
+            <h1 class="title-bar">Creating a basic thread</h1>
+        </div>
+
+    <!------------------------------------------Step One------------------------------------------>
+        <div class="start-divider"></div>
+        <div class="step" id="step-1">
+            <h2>1. Include the <u>library</u>:</h2>
+            <code>#include &lt;pthread.h&gt;</code>
+            <span class="caption">
+                <ul>
+                    <li>
+                        See more: 
+                        <a href="https://pubs.opengroup.org/onlinepubs/7908799/xsh/pthread.h.html" target="_blank">
+                            <span class="link">link</span>
+                        </a>
+                    </li>
+                </ul>
+            </span>
+        </div> <!-- Step 1 -->
+
+    <!------------------------------------------Step Two------------------------------------------>
+        <div class="divider"></div>
+        <div class="step" id="step-2">
+            <h2>2. Create the <u>thread function</u> (must accept a <b>void pointer</b> and return a single <b>void pointer)</b>:</h2>
+            <code>void* thread_function(void *thread_id) {
+        int tid = *((int*)thread_id);
+        fprintf(stdout, "Hello from Thread %d!\n", tid);
+        return NULL;
+    }</code>
+        
+            <span class="caption">
+                <ul>
+                    <li>The function that the thread will execute once it is created.</li>
+                </ul>
+            </span>
+
+            <aside class="warning">
+                <span class="aside-icon">⚠️</span>
+                <p>
+                    Note: '<i>thread_id</i>' is a <b>void pointer</b>. In order to <u>display it as an integer</u>, we need to first <u>cast it</u> into an <b>integer pointer</b> and then <u>dereference</u> this integer pointer.
+                </p>
+            </aside>
+
+            <aside class="warning">
+                <span class="aside-icon">⚠️</span>
+                <p>
+                    In order for this to work, you'll need to check the <a href="#step-4">4th point's warning</a>.
+                </p>
+            </aside>
+        </div> <!-- Step 2 -->
+
+    <!------------------------------------------Step Three---------------------------------------->
+        <div class="divider"></div>
+        <div class="step" id="step-3">
+            <h2>3. Declare a <u>variable for the thread ID</u> (used to identify each thread) of type '<i>pthread_t</i>':</h2>
+            <code>pthread_t tid;</code>
+            <span class="caption">
+                <ul class="arrow-list">
+                    <li>Thread IDs are used to identify each thread.</li>
+                    <li>A value will then be passed through the 'pthread_create' function.</li>
+                </ul>
+            </span>
+        </div> <!-- Step 3 -->
+
+    <!------------------------------------------Step Four----------------------------------------->
+        <div class="divider"></div>
+        <div class="step" id="step-4">
+            <div class="step">
+                <h2>4. Create the <u>actual thread</u>:</h2>
+                <code>pthread_create(&amp;tid, NULL, thread_function, NULL);</code>
+                
+                <span class="caption">
+                    Parameters:
+                    <ul class="arrow-list">
+                        <li>Address of thread ID (<i>&tid</i>).</li>
+                        <li>Address of thread's attributes (<i>&attr</i>); or NULL for default attributes.</li>
+                        <li>Thread's function &lt;<i>thread_function_name</i>&gt; from <a href="#step-2">Step 2</a>.</li>
+                        <li>Address of the data that needs to be passed to the thread's function.</li>
+                    </ul>
+                </span>
+                
+                <aside class="warning">
+                    <span class="aside-icon">⚠️</span>
+                    <p>
+                        If a <b>thread's identifier</b> needs to be <u>passed</u> in the <b>thread's function</b> (e.g.: so that the function can print or use the specific thread's ID), you'll need to first initialize it:
+                    </p>
+                </aside>
+                
+                <code>int thread_id = 1;</code>
+                
+                <span class="caption">
+                    <ul class="bullet">
+                        <li>It can be any kind of data that the user might want to pass to the thread's function.</li>
+                    </ul>
+                </span>
+            </div> <!-- Step 4.0 -->
+            
+            <div class="step" id="step-4-addition-1">
+                <h2>Add <u>error handling</u>:</h2>
+                <code>int thread_create_status = pthread_create(&amp;tid, NULL, thread_function, &amp;thread_id);
+if (thread_create_status != 0) {
+    fprintf(stderr, "Failed to create thread.\n");
+    return -1;
+}</code>
+                    
+                <span class="caption">
+                    <ul class="bullet">
+                        <li>It would be better to first declare 'ret_tcreate' at the top of the program, so that we keep all the 'main' local variables initialized in the same place.</li>
+                    </ul>
+                </span>
+                
+                <aside class="question">
+                    <span class="aside-icon">❓</span>
+                    <ul>
+                        <span class="question-line">Q: Why do I name the variable 'thread_create_status'?</span><br>
+                        <li>A: The 'thread_create' part is simple to understand, but the 'status' part is used for a reason. I could use a name like 'result' or 'return_value', but that would be the case for a function that computes or returns a value upon success. On the other hand, 'status' is used as a success/failure indicator.</li>
+                    </ul>
+                </aside>
+            </div> <!-- Additional Step 1-->
+            
+            <div class="step" id="step-4-addition-2">
+                <h2>Since we're working with a simple program, we'll use <u>simple</u> exit codes, only indicating the program's <b>success</b> or program's <b>failure</b>:</h2>
+                
+                <code>#include &lt;stdlib.h&gt;
+// (...)
+int thread_create_status = pthread_create(&tid, NULL, thread_function, &thread_id);
+if (thread_create_status != 0) {
+    fprintf(stderr, "Failed to create thread.\n");
+    return EXIT_FAILURE;
+}</code>
+                    
+                <span class="caption">
+                    <ul class="arrow-list">
+                        <li>The library '<i>stdlib.h</i>' includes <b>EXIT_FAILURE</b>, <b>EXIT_SUCCESS</b>, and some other useful stuff.</li>
+                        <li>We'll use the <b>EXIT_SUCCESS</b> for the <i>main</i> function's exit code, too.</li>
+                    </ul>
+                </span>
+            </div> <!-- Additional Step 2 -->
+        </div> <!-- Step 4 -->
+
+    <!------------------------------------------Step Five----------------------------------------->
+        <div class="divider"></div>
+        <div class="step" id="step-5">
+            <h2 class="step" id="step-5">5. <u>Join</u> the thread (optional, but <b>mostly important</b>):</h2>
+            <code>pthread_join(tid, NULL);</code>
+
+            <span class="caption">
+                <ul class="bullet">
+                    <li>The '<i>pthread_join</i>' function suspends execution of the calling thread until the target ahead terminates. Waiting for the thread to finish before proceeding is crucial for managing shared resources and ensuring that the program doesn't exit before all threads complete their tasks.</li>
+                </ul>
+            </span>
+
+            <h2 id="step-5-addition-1">Add a <b>pointer to a location</b> where the <u>exit_status</u> of the <u>thread's start routine</u> will be stored:</h2>
+            <code>void *thread_exit_status;
+pthread_join(tid, &thread_exit_status);
+// Optionally, use the return value;</code>
+
+            <span class="caption">
+                <ul class="bullet">
+                    <li>This is <u>optional</u>. More on the <b>exit status</b> when I learn more about it.</li>
+                </ul>
+            </span>
+        </div> <!-- Step 5 -->
+
+    <!------------------------------------------Final Part---------------------------------------->
+        <div class="divider"></div>
+        <div class="step" id="final-step">
+            <h2>The final code of a program for creating a basic thread may look like that:</h2>
+            <code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;pthread.h&gt;
+
+void* thread_function(void *thread_id) {
+    int tid = *((int*)thread_id);
+    fprintf(stdout, "Hello from Thread %d!\n", tid);
+    return NULL;
+}
+
+int main() {
+    pthread_t tid;
+    int thread_id = 1;
+    int thread_create_status;
+
+    thread_create_status = pthread_create(&amp;tid, NULL, thread_function, &amp;thread_id);
+    if (thread_create_status != 0) {
+        fprintf(stderr, "Failed to create thread.\n");
+        return EXIT_FAILURE;
+    }
+
+    pthread_join(tid, NULL);
+
+    return EXIT_SUCCESS;
+}
+    </code>
+        </div> <!-- Final Step -->
+
+        <!------------------------------------------Title Bar----------------------------------------->
+        <header class="app-bar" id="bottom">
+            <nav class="nav-left">
+                <a href="#top">Go to top</a>
+            </nav>
+            <nav class="nav-right">
+                <a href="../2-custom-attributes/index.html">Next Page</a>
+            </nav>
+        </header>
+
+    </body>
+</html>
